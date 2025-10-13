@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -e
+
+# Change to script directory
+cd "$(dirname "$0")/.."
+
+# Activate conda environment if available
+if [ -f "/home/ubuntu/miniconda3/bin/activate" ]; then
+    source /home/ubuntu/miniconda3/bin/activate wyoming-kokoro
+fi
+
+# Run the server with models directory
+python3 -m wyoming_kokoro.server \
+    --model ./models/kokoro-v1.0.onnx \
+    --voices ./models/voices-v1.0.bin \
+    "$@"

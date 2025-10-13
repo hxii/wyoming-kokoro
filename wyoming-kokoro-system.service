@@ -1,0 +1,18 @@
+[Unit]
+Description=Wyoming Kokoro TTS Server (ONNX)
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+WorkingDirectory=/opt/wyoming-kokoro
+Environment="PATH=/opt/wyoming-kokoro/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ExecStart=/opt/wyoming-kokoro/venv/bin/python -m wyoming_kokoro.server --uri tcp://0.0.0.0:10200 --model /opt/wyoming-kokoro/models/kokoro-v1.0.onnx --voices /opt/wyoming-kokoro/models/voices-v1.0.bin
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

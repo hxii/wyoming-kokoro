@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Convert HuggingFace ONNX models to be compatible with kokoro-onnx library
+# This renames input_ids -> tokens and waveform -> audio
+
+set -e
+
+# Activate conda environment if available
+if [ -f "/home/ubuntu/miniconda3/bin/activate" ]; then
+    source /home/ubuntu/miniconda3/bin/activate wyoming-kokoro
+fi
+
+if [ $# -lt 2 ]; then
+    echo "Usage: $0 <input.onnx> <output.onnx>"
+    echo ""
+    echo "Converts HuggingFace Kokoro ONNX models to kokoro-onnx compatible format"
+    echo "by renaming:"
+    echo "  - input_ids -> tokens"
+    echo "  - waveform -> audio"
+    echo ""
+    echo "Example:"
+    echo "  $0 models/model_q8f16.onnx models/model_q8f16_converted.onnx"
+    exit 1
+fi
+
+INPUT_FILE="$1"
+OUTPUT_FILE="$2"
+
+if [ ! -f "$INPUT_FILE" ]; then
+    echo "Error: Input file '$INPUT_FILE' not found"
+    exit 1
+fi
+
+echo "Converting ONNX model for kokoro-onnx compatibility..."
+echo "Input:  $INPUT_FILE"
+echo "Output: $OUTPUT_FILE"
+
+# Create temporary file
+TEMP_FILE="${OUTPUT_FILE}.temp"
+
+# Step 1: Rename input_ids -> tokens
+echo "Step 1: Renaming input_ids -> tokens..."
+sor4onnx \
+    --input_onnx_file_path "$INPUT_FILE" \
+    --output_onnx_file_path "$TEMP_FILE" \
+    --old_new input_ids tokens \
+    --mode inputs \
+    --search_mode exact_match
+
+# Step 2: Rename waveform -> audio
+echo "Step 2: Renaming waveform -> audio..."
+sor4onnx \
+    --input_onnx_file_path "$TEMP_FILE" \
+    --output_onnx_file_path "$OUTPUT_FILE" \
+    --old_new waveform audio \
+    --mode outputs \
+    --search_mode exact_match
+
+# Clean up temp file
+rm -f "$TEMP_FILE"
+
+echo "Conversion complete!"
+echo ""
+echo "You can now use this model with the ONNX server:"
+echo "  ./script/run-onnx --model $OUTPUT_FILE"
