@@ -19,12 +19,12 @@ WORKDIR /app
 RUN uv venv && uv pip install -r requirements.txt
 
 # Get the models
-# RUN mkdir models && \
-#   wget https://github.com/nazdridoy/kokoro-tts/releases/download/v1.0.0/kokoro-v1.0.onnx -o models/kokoro-v1.0.onnx && \
-#   wget https://github.com/nazdridoy/kokoro-tts/releases/download/v1.0.0/voices-v1.0.bin -o models/voices-v1.0.bin
+RUN mkdir models && \
+  wget https://github.com/nazdridoy/kokoro-tts/releases/download/v1.0.0/kokoro-v1.0.onnx -O models/kokoro-v1.0.onnx -t 3 && \
+  wget https://github.com/nazdridoy/kokoro-tts/releases/download/v1.0.0/voices-v1.0.bin -O models/voices-v1.0.bin -t 3
 
-COPY models/kokoro-v1.0.onnx /app/models/
-COPY models/voices-v1.0.bin /app/models/
+# COPY models/kokoro-v1.0.onnx /app/models/
+# COPY models/voices-v1.0.bin /app/models/
 
 EXPOSE 10200
 
