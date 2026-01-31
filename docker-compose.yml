@@ -1,0 +1,8 @@
+services:
+  wyoming-kokoro:
+    build: .
+    ports:
+      - "10200:10200"
+    # volumes:
+    #   - ./models:/app/models
+    command: uv run python -m wyoming_kokoro.server --model ./models/kokoro-v1.0.onnx --voices ./models/voices-v1.0.bin
